@@ -1,0 +1,400 @@
+import time
+from copy import deepcopy
+from sys import exit
+from pygame.locals import *
+import sys 
+import pygame
+from global_vars import *
+
+STARTING_NUMBER_OF_STONES = 4
+
+class State:
+
+    def __init__(self):
+        pass
+
+    def getNewBoard(self):
+        s = STARTING_NUMBER_OF_STONES
+        return {'1': 0, '2': 0, 'A': s, 'B': s, 'C': s, 'D': s, 'E': s,
+                'F': s, 'G': s, 'H': s, 'I': s, 'J': s, 'K': s, 'L': s}  # tabuleiro inicial
+
+    def displayBoard(self, board):
+        stoneAmounts = []
+
+        for pit in 'GHIJKL21ABCDEF':
+            numStonesInThisPit = str(board[pit])
+            stoneAmounts.append(numStonesInThisPit)
+
+        posicao_mancala = 436
+        posicao_1y = 557
+        posicao_2y = 315
+
+        tabuleiro_img = pygame.image.load("tabuleiro_3.png")
+        tabuleiro_x = (largura - tabuleiro_img.get_width()) // 2
+        tabuleiro_y = (altura - tabuleiro_img.get_height()) // 2
+        tela.blit(tabuleiro_img, (tabuleiro_x, tabuleiro_y))
+        pygame.display.flip()
+
+        texta = fonte1.render(str(stoneAmounts[8]), True, cor_texto)
+        tela.blit(texta, (368, posicao_1y))
+
+        textb = fonte1.render(str(stoneAmounts[9]), True, cor_texto)
+        tela.blit(textb, (493, posicao_1y))
+
+        textc = fonte1.render(str(stoneAmounts[10]), True, cor_texto)
+        tela.blit(textc, (618, posicao_1y))
+
+        textd = fonte1.render(str(stoneAmounts[11]), True, cor_texto)
+        tela.blit(textd, (743, posicao_1y))
+
+        texte = fonte1.render(str(stoneAmounts[12]), True, cor_texto)
+        tela.blit(texte, (868, posicao_1y))
+
+        textf = fonte1.render(str(stoneAmounts[13]), True, cor_texto)
+        tela.blit(textf, (993, posicao_1y))
+
+        textg = fonte1.render(str(stoneAmounts[5]), True, cor_texto)
+        tela.blit(textg, (993, posicao_2y))
+
+        texth = fonte1.render(str(stoneAmounts[4]), True, cor_texto)
+        tela.blit(texth, (868, posicao_2y))
+
+        texti = fonte1.render(str(stoneAmounts[3]), True, cor_texto)
+        tela.blit(texti, (743, posicao_2y))
+
+        textj = fonte1.render(str(stoneAmounts[2]), True, cor_texto)
+        tela.blit(textj, (618, posicao_2y))
+
+        textk = fonte1.render(str(stoneAmounts[1]), True, cor_texto)
+        tela.blit(textk, (493, posicao_2y))
+
+        textl = fonte1.render(str(stoneAmounts[0]), True, cor_texto)
+        tela.blit(textl, (368, posicao_2y))
+
+        text1 = fonte1.render(str(stoneAmounts[7]), True, cor_texto)
+        tela.blit(text1, (1118, posicao_mancala))
+
+        text2 = fonte1.render(str(stoneAmounts[6]), True, cor_texto)
+        tela.blit(text2, (243, posicao_mancala))
+
+        pygame.time.delay(200)
+        pygame.display.update()
+        
+
+    def askForPlayerMove(self, pTurn, board):
+
+        while True:
+            # pedir uma jogada
+            if pTurn == '1':
+                textMove1a = fonte1.render(
+                    '1                                   A - F', True, cor_texto)
+                tela.blit(textMove1a, (493, 50))
+                pygame.display.update()
+                
+
+            elif pTurn == '2':
+                textMove2 = fonte1.render(
+                    '2                                   G - L', True, cor_texto)
+                tela.blit(textMove2, (493, 50))
+                pygame.display.update()
+                
+
+            # aguardar entrada do jogador
+            letter = None
+            while letter is None:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        print('Thanks for playing!')
+                        pygame.quit()
+                        sys.exit()
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            print('Thanks for playing!')
+                            pygame.quit()
+                            sys.exit()
+                        elif event.unicode.isalpha():
+                            letter = event.unicode.upper()
+
+            if (pTurn == '1' and letter not in PLAYER_1_PITS) or (
+                pTurn == '2' and letter not in PLAYER_2_PITS
+            ):
+                textj1 = fonte2.render(
+                    'Please pick a letter on your side of the board.', True, cor_texto)
+                tela.blit(textj1, (400, 100))
+                pygame.display.update()
+                continue
+
+            if board.get(letter) == 0:
+                textj2 = fonte2.render(
+                    'Please pick a non-empty pit.', True, cor_texto)
+                tela.blit(textj2, (520, 100))
+                pygame.display.update()
+                continue  # pedir mais uma jogada caso o jogador tenha clicado em uma casa vazia
+
+            return letter
+
+    def makeMove(self, board, pTurn, pit):
+
+        stonesToSow = board[pit]  # pegar o numero de pedras
+        board[pit] = 0  # esvaziar o buraco selecionado
+
+        while stonesToSow > 0:
+            pit = NEXT_PIT[pit]
+            if (pTurn == '1' and pit == '2') or (
+                    pTurn == '2' and pit == '1'):
+                continue
+            board[pit] += 1
+            stonesToSow -= 1
+
+        # aplicação da regra da casa oposta
+
+        if pTurn == '1' and pit in PLAYER_1_PITS and board[pit] == 1:
+            oppositePit = OPPOSITE_PIT[pit]
+            if board[oppositePit] > 0:
+                board['1'] += board[oppositePit] + 1
+                board[oppositePit] = 0
+                board[pit] = 0
+        elif pTurn == '2' and pit in PLAYER_2_PITS and board[pit] == 1:
+            oppositePit = OPPOSITE_PIT[pit]
+            if board[oppositePit] > 0:
+                board['2'] += board[oppositePit] + 1
+                board[oppositePit] = 0
+                board[pit] = 0
+
+        if pTurn == '1':
+            return '2'
+        elif pTurn == '2':
+            return '1'
+
+    def checkForWinner(self, board):  # checar o vencedor
+
+        player1Total = board['A'] + board['B'] + board['C']
+        player1Total += board['D'] + board['E'] + board['F']
+        player2Total = board['G'] + board['H'] + board['I']
+        player2Total += board['J'] + board['K'] + board['L']
+
+        if player1Total == 0:
+            board['2'] += player2Total
+            for pit in PLAYER_2_PITS:
+                board[pit] = 0
+        elif player2Total == 0:
+            board['1'] += player1Total
+            for pit in PLAYER_1_PITS:
+                board[pit] = 0
+        else:
+            return 'no winner'
+
+        if board['1'] > board['2']:  # determinação do resultado
+            return '1'
+        elif board['2'] > board['1']:
+            return '2'
+        else:
+            return '0'
+        
+    def get_mancala_stones(self, board):
+        return board['1'], board['2']
+
+    def available_moves(self, board, player):
+        if player == '1':
+            pits = PLAYER_1_PITS
+        else:
+            pits = PLAYER_2_PITS
+
+        moves = [pit for pit in pits if board[pit] > 0]
+        return moves
+    
+    def simulate_move(self, board, player, move):
+        new_board = board.copy()
+        new_player = '1' if player == '2' else '2'
+        self.makeMove(new_board, player, move)
+        return new_board, new_player
+    
+    def evaluate_board(self, board):
+            return board['2'] - board['1']
+
+    def minimax(self, board, player, depth, alpha, beta, is_maximizing):
+        if depth == 0 or self.checkForWinner(board) != 'no winner':
+            return self.evaluate_board(board)
+
+        moves = self.available_moves(board, player)
+
+        if is_maximizing:
+            max_eval = float('-inf')
+            for move in moves:
+                new_board, new_player = self.simulate_move(board, player, move)
+                eval = self.minimax(new_board, new_player, depth - 1, alpha, beta, False)
+                max_eval = max(max_eval, eval)
+                alpha = max(alpha, eval)
+                if beta <= alpha:
+                    break
+            return max_eval
+        else:
+            min_eval = float('inf')
+            for move in moves:
+                new_board, new_player = self.simulate_move(board, player, move)
+                eval = self.minimax(new_board, new_player, depth - 1, alpha, beta, True)
+                min_eval = min(min_eval, eval)
+                beta = min(beta, eval)
+                if beta <= alpha:
+                    break
+            return min_eval
+
+    def find_best_move(self, board, player, depth):
+        best_move = None
+        best_eval = float('-inf')
+        moves = self.available_moves(board, player)
+
+        for move in moves:
+            new_board, new_player = self.simulate_move(board, player, move)
+            eval = self.minimax(new_board, new_player, depth - 1, float('-inf'), float('inf'), False)
+            if eval > best_eval:
+                best_eval = eval
+                best_move = move
+
+        return best_move
+    
+        
+    def execute_minimax_move(self, evaluate_func, depth):
+        def execute_minimax_move_aux():
+            state = State()
+            best_move = None
+            best_eval = float('-inf')
+
+            for move in state.available_moves():
+                new_mancala_game = state.makeMove(move)
+                new_state_eval = self.minimax(new_mancala_game, depth - 1, float('-inf'), float('+inf'), False, state.current_player(), evaluate_func)
+                if new_state_eval > best_eval:
+                    best_move = move
+                    best_eval = new_state_eval
+            state.apply_move(best_move)
+
+        return execute_minimax_move_aux
+
+class MancalaGame:
+
+    def __init__(self, player_1, player_2):
+        self.state = State()
+        self.player_1 = player_1
+        self.player_2 = player_2
+        pygame.display.set_caption("Mancala Game")
+        self.tela = pygame.display.set_mode((1400, 788))
+        self.player_turn = '1'
+        self.difficulty = 0
+
+
+        #self.clock = pygame.time.Clock()
+        self.running = True
+
+    def instructions(self):
+
+        tabuleiro_img = pygame.image.load("instrucoes.png")
+        tabuleiro_x = (largura - tabuleiro_img.get_width()) // 2
+        tabuleiro_y = (altura - tabuleiro_img.get_height()) // 2
+        tela.blit(tabuleiro_img, (tabuleiro_x, tabuleiro_y))
+        pygame.display.flip()
+
+        # Espere o jogador pressionar a barra de espaço
+        while True:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == KEYDOWN:
+                    if event.key == K_SPACE:
+                        return 
+                    
+    def set_difficulty(self):
+        difficulty_depth = {'1': 4, '2': 7, '3': 10}
+        selected_difficulty = None
+
+        tabuleiro_img = pygame.image.load("dificuldade.png")
+        tabuleiro_x = (largura - tabuleiro_img.get_width()) // 2
+        tabuleiro_y = (altura - tabuleiro_img.get_height()) // 2
+        tela.blit(tabuleiro_img, (tabuleiro_x, tabuleiro_y))
+        pygame.display.flip()
+
+        while not selected_difficulty:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.unicode.upper() in difficulty_depth:
+                        selected_difficulty = event.unicode.upper()
+                        self.difficulty = difficulty_depth[selected_difficulty]
+                        break
+        return self.difficulty
+    
+        
+        
+    def main(self):
+        gameBoard = self.state.getNewBoard()
+
+        self.instructions()
+        self.set_difficulty()
+
+        running = True
+            
+        while running:  # correr a jogada de algum jogador
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+
+            self.state.displayBoard(gameBoard)
+
+            if self.player_turn == self.player_2:
+                move = self.state.find_best_move(gameBoard, self.player_2, depth=self.difficulty)
+                self.player_turn = self.state.makeMove(gameBoard, self.player_2, move)
+            else:
+                player_move = self.state.askForPlayerMove(self.player_turn, gameBoard)
+                self.player_turn = self.state.makeMove(gameBoard, self.player_turn, player_move)
+
+            # testar se o jogo ja acabou e declarar o vencedor
+            winner = self.state.checkForWinner(gameBoard)
+            if winner == '1':
+                tabuleiro_img = pygame.image.load("winner1.png")
+                tabuleiro_x = (largura - tabuleiro_img.get_width()) // 2
+                tabuleiro_y = (altura - tabuleiro_img.get_height()) // 2
+                tela.blit(tabuleiro_img, (tabuleiro_x, tabuleiro_y))
+                pygame.display.flip()
+                mancala1, mancala2 = self.state.get_mancala_stones(gameBoard)
+                textwin = fonte1.render(str(f"{mancala1} X {mancala2}"), True, cor_texto)
+                tela.blit(textwin, (650, 450))
+                pygame.display.update()
+                running = False
+                pygame.time.wait(5000)
+
+            elif winner == '2':  # empate
+                tabuleiro_img = pygame.image.load("winner2.png")
+                tabuleiro_x = (largura - tabuleiro_img.get_width()) // 2
+                tabuleiro_y = (altura - tabuleiro_img.get_height()) // 2
+                tela.blit(tabuleiro_img, (tabuleiro_x, tabuleiro_y))
+                pygame.display.flip()
+                mancala1, mancala2 = self.state.get_mancala_stones(gameBoard)
+                textwin = fonte1.render(str(f"{mancala1} X {mancala2}"), True, cor_texto)
+                tela.blit(textwin, (650, 450))
+                pygame.display.update()
+                running = False
+                pygame.time.wait(5000)
+
+            elif winner == '0':  # empate
+                tabuleiro_img = pygame.image.load("tie.png")
+                tabuleiro_x = (largura - tabuleiro_img.get_width()) // 2
+                tabuleiro_y = (altura - tabuleiro_img.get_height()) // 2
+                tela.blit(tabuleiro_img, (tabuleiro_x, tabuleiro_y))
+                pygame.display.flip()
+                mancala1, mancala2 = self.state.get_mancala_stones(gameBoard)
+                textwin = fonte1.render(str(f"{mancala1} X {mancala2}"), True, cor_texto)
+                tela.blit(textwin, (650, 450))
+                pygame.display.update()
+                running = False
+                pygame.time.wait(5000)
+
+        self.state.displayBoard(gameBoard)
+
+if __name__ == "__main__":
+    player_1 = '1'
+    player_2 = '2'  # Minimax AI as player 2
+
+    mancala_game = MancalaGame(player_1, player_2)
+    mancala_game.main()
