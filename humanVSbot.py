@@ -335,7 +335,7 @@ class MancalaGame:
                         return 
                     
     def set_difficulty(self):
-        difficulty_depth = {'1': 1, '2': 4, '3': 9}
+        difficulty_depth = {'1': 1, '2': 7, '3': 9}
         selected_difficulty = None
 
         # display the difficulty screen with the three options
