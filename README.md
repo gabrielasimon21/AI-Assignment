@@ -7,3 +7,5 @@ It is necessary to have the game mode file chosen in the same folder as globalVa
 To run the game, just paste the code for the chosen game mode in your favorite editor and hit run!
 
 **Have fun :)**
+
+By Gabriela Simon and Noa Santos
