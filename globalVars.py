@@ -10,11 +10,11 @@ PLAYER_2_PITS = ('G', 'H', 'I', 'J', 'K', 'L')
 
 NEXT_PIT = {'A': 'B', 'B': 'C', 'C': 'D', 'D': 'E', 'E': 'F', 'F': '1',
             '1': 'L', 'L': 'K', 'K': 'J', 'J': 'I', 'I': 'H', 'H': 'G',
-            'G': '2', '2': 'A'}  # para onde as peças vão em ordem anti horaria
+            'G': '2', '2': 'A'}  # Where the stones go in order
 
 OPPOSITE_PIT = {'A': 'G', 'B': 'H', 'C': 'I', 'D': 'J', 'E': 'K',
                 'F': 'L', 'G': 'A', 'H': 'B', 'I': 'C', 'J': 'D',
-                'K': 'E', 'L': 'F'}  # casa paralela do oponente, usada para regra de pegar as pedras do oponente
+                'K': 'E', 'L': 'F'}  # Opponent's opposite pit
 
 PIT_LABELS = 'ABCDEF1LKJIHG2'
 
