@@ -1,4 +1,4 @@
-# assigmentAI
+# AI Assignment
 
 To run, it's necessary to have python installed in your machine.
 It is possible to choose between three game modes: Human VS Human, Human VS Bot and Bot VS Bot.
