@@ -265,7 +265,7 @@ class MancalaGame:
 
             if winner == '1':
                 # Display winner 1 image and the final score
-                tabuleiro_img = pygame.image.load("human.png")
+                tabuleiro_img = pygame.image.load("winner1.png")
                 tabuleiro_x = (largura - tabuleiro_img.get_width()) // 2
                 tabuleiro_y = (altura - tabuleiro_img.get_height()) // 2
                 tela.blit(tabuleiro_img, (tabuleiro_x, tabuleiro_y))
@@ -279,7 +279,7 @@ class MancalaGame:
 
             elif winner == '2':  
                 # Display winner 2 image and the final score
-                tabuleiro_img = pygame.image.load("ai.png")
+                tabuleiro_img = pygame.image.load("winner2.png")
                 tabuleiro_x = (largura - tabuleiro_img.get_width()) // 2
                 tabuleiro_y = (altura - tabuleiro_img.get_height()) // 2
                 tela.blit(tabuleiro_img, (tabuleiro_x, tabuleiro_y))
