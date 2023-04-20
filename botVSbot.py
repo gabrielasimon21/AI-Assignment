@@ -233,7 +233,7 @@ class State:
         
     def minimax(self, board, player, depth, alpha, beta, is_maximizing):
         if depth == 0 or self.checkForWinner(board) != 'no winner':
-            return self.evaluate_board(board, player)
+            return self.evaluate_board(board)
 
   
         # Get the available moves for the current player
@@ -316,7 +316,7 @@ class MancalaGame:
         # Set up the game window
         pygame.display.set_caption("Mancala Game")
         self.tela = pygame.display.set_mode((1400, 788))
-        # Set the current player turn and difficulty level
+        # Set the current player turn
         self.player_turn = '1'
 
         # Initialize the game loop variables
@@ -337,13 +337,13 @@ class MancalaGame:
             self.state.displayBoard(gameBoard)
 
             # If it's the computer's turn, choose the best move using minimax algorithm
-            if self.player_turn == self.player_2:
-                move = self.state.find_best_move(gameBoard, self.player_2, depth=self.difficulty)
-                self.player_turn = self.state.makeMove(gameBoard, self.player_2, move)
-            # If it's the player's turn, ask for their move and update the game board
+            if self.player_turn == self.player_1:
+                player_move = self.state.find_best_move(gameBoard, self.player_1, depth=3)
+                self.player_turn = self.state.makeMove(gameBoard, self.player_1, player_move)
             else:
-                player_move = self.state.askForPlayerMove(self.player_turn, gameBoard)
-                self.player_turn = self.state.makeMove(gameBoard, self.player_turn, player_move)
+                move = self.state.find_best_move(gameBoard, self.player_2, depth=1)
+                self.player_turn = self.state.makeMove(gameBoard, self.player_2,player_move)
+
 
             # Check if the game has ended and display the winner
             self.winner = self.state.checkForWinner(gameBoard)
